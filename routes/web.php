@@ -19,12 +19,13 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
 
     // Transactions
     // Kas Masjid (Transactions)
-    Route::resource('kas', \App\Http\Controllers\TransactionController::class)->parameters(['kas' => 'transaction'])->only(['index', 'create', 'store', 'destroy']);
+    Route::resource('kas', \App\Http\Controllers\TransactionController::class)->parameters(['kas' => 'transaction'])->only(['index', 'create', 'destroy']);
+    Route::post('kas', [\App\Http\Controllers\TransactionController::class, 'store'])->name('kas.store')->middleware('throttle:transactions');
     Route::put('kas/{transaction}/verify', [\App\Http\Controllers\TransactionController::class, 'verify'])->name('kas.verify');
 
     // Zakat
     Route::get('zakat', [\App\Http\Controllers\ZakatController::class, 'index'])->name('zakat.index');
-    Route::post('zakat', [\App\Http\Controllers\ZakatController::class, 'store'])->name('zakat.store');
+    Route::post('zakat', [\App\Http\Controllers\ZakatController::class, 'store'])->name('zakat.store')->middleware('throttle:transactions');
     Route::post('zakat/kalkulator', [\App\Http\Controllers\ZakatController::class, 'kalkulator'])->name('zakat.kalkulator');
     
     // Zakat Sub-menus (Placeholders)
@@ -42,7 +43,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::get('tromol', [\App\Http\Controllers\TromolController::class, 'index'])->name('tromol.index');
     Route::get('tromol/history', [\App\Http\Controllers\TromolController::class, 'history'])->name('tromol.history');
     Route::get('tromol/{tromolBox}/input', [\App\Http\Controllers\TromolController::class, 'input'])->name('tromol.input');
-    Route::post('tromol/{tromolBox}/input', [\App\Http\Controllers\TromolController::class, 'store'])->name('tromol.input.store');
+    Route::post('tromol/{tromolBox}/input', [\App\Http\Controllers\TromolController::class, 'store'])->name('tromol.input.store')->middleware('throttle:transactions');
 
     // Other Features (Placeholders)
     // Inventaris

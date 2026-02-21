@@ -23,14 +23,17 @@ class MuzakkiController extends Controller
                   ->orWhere('phone', 'like', '%' . request('search') . '%');
         }
 
+        $userRole = request()->user()->role;
+        $canViewPrivateData = in_array($userRole, ['super_admin', 'bendahara']);
+
         $muzakkis = $query->latest()
             ->paginate(15)
             ->withQueryString()
             ->through(fn ($donatur) => [
                 'id' => $donatur->id,
                 'name' => $donatur->name,
-                'phone' => $donatur->phone,
-                'address' => $donatur->address,
+                'phone' => $canViewPrivateData ? $donatur->phone : ($donatur->phone ? '*** (Rahasia)' : null),
+                'address' => $canViewPrivateData ? $donatur->address : ($donatur->address ? 'Dirahasiakan' : null),
                 // Add total donation calculation here if needed later
             ]);
 

@@ -1,0 +1,69 @@
+services:
+  - type: web
+    name: e-masjid
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    envVars:
+      - key: APP_NAME
+        value: E-Masjid
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        value: https://e-masjid.onrender.com
+
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: error
+
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: e-masjid-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: e-masjid-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: e-masjid-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: e-masjid-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: e-masjid-db
+          property: password
+
+      - key: SESSION_DRIVER
+        value: database
+      - key: SESSION_LIFETIME
+        value: "30"
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: SESSION_HTTP_ONLY
+        value: "true"
+      - key: SESSION_SAME_SITE
+        value: strict
+
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: sync
+
+databases:
+  - name: e-masjid-db
+    plan: free
+    databaseName: emasjid_production
+    user: emasjid_user

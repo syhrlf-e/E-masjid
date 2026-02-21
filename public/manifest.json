@@ -1,0 +1,56 @@
+{
+    "name": "E-Masjid",
+    "short_name": "E-Masjid",
+    "description": "Sistem informasi manajemen masjid terpadu.",
+    "start_url": "/?source=pwa",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#f8fafc",
+    "theme_color": "#059669",
+    "lang": "id-ID",
+    "categories": ["finance", "productivity", "utilities"],
+    "icons": [
+        {
+            "src": "/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/images/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "Kas Masjid",
+            "short_name": "Kas",
+            "description": "Catat transaksi Kas",
+            "url": "/kas",
+            "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }]
+        },
+        {
+            "name": "Zakat",
+            "short_name": "Zakat",
+            "description": "Catat Zakat Fitrah & Maal",
+            "url": "/zakat",
+            "icons": [{ "src": "/images/icon-192.png", "sizes": "192x192" }]
+        }
+    ]
+}

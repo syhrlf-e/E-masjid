@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, vi } from "vitest";
+import { describe, it, vi, expect } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ConfirmDialog from "../Components/ConfirmDialog";

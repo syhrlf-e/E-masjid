@@ -10,6 +10,7 @@ import SecondaryButton from "@/Components/SecondaryButton";
 import { formatRupiah } from "@/utils/formatter"; // Ensure this exists or I'll fix it
 import { Loader2 } from "lucide-react";
 import RupiahInput from "@/Components/RupiahInput"; // Need to check if this exists
+import { useNetwork } from "@/Hooks/useNetwork";
 
 // Checking components: RupiahInput.tsx exists.
 
@@ -36,6 +37,7 @@ export default function ZakatForm({ isOpen, onClose, muzakkis }: Props) {
             notes: "",
         });
 
+    const isOnline = useNetwork();
     const [calculatedZakat, setCalculatedZakat] = useState(0);
 
     // Auto-calculate logic
@@ -263,7 +265,7 @@ export default function ZakatForm({ isOpen, onClose, muzakkis }: Props) {
                         >
                             Batal
                         </SecondaryButton>
-                        <PrimaryButton disabled={processing}>
+                        <PrimaryButton disabled={processing || !isOnline}>
                             {processing ? "Menyimpan..." : "Simpan Transaksi"}
                         </PrimaryButton>
                     </div>
