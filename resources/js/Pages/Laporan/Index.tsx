@@ -1,0 +1,330 @@
+import React, { useState } from "react";
+import AppLayout from "@/Layouts/AppLayout";
+import { Head, router } from "@inertiajs/react";
+import { PageProps } from "@/types";
+import {
+    ArrowDownRight,
+    ArrowUpRight,
+    Wallet,
+    PieChart,
+    Activity,
+    Building,
+    TrendingDown,
+    TrendingUp,
+    CalendarDays,
+} from "lucide-react";
+
+interface SummaryData {
+    pemasukan_bulan_ini: number;
+    pengeluaran_bulan_ini: number;
+    saldo_akhir_bulan: number;
+    saldo_total_kas: number;
+}
+
+interface BreakdownItem {
+    category: string;
+    total: number;
+}
+
+interface ReportProps extends Record<string, unknown> {
+    month: string | number;
+    year: string | number;
+    summary: SummaryData;
+    breakdown: {
+        pemasukan: BreakdownItem[];
+        pengeluaran: BreakdownItem[];
+    };
+}
+
+export default function LaporanIndex({
+    auth,
+    month,
+    year,
+    summary,
+    breakdown,
+}: PageProps<ReportProps>) {
+    const [selectedMonth, setSelectedMonth] = useState(
+        month.toString().padStart(2, "0"),
+    );
+    const [selectedYear, setSelectedYear] = useState(year.toString());
+
+    const formatCurrency = (amount: number) => {
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            minimumFractionDigits: 0,
+        }).format(amount || 0);
+    };
+
+    const handleFilter = () => {
+        router.get(
+            route("laporan.index"),
+            { month: selectedMonth, year: selectedYear },
+            { preserveState: true },
+        );
+    };
+
+    const formatCat = (cat: string) => {
+        const withSpaces = cat.replace(/_/g, " ");
+        return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
+    };
+
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+
+    const getMonthName = (monthNumber: string) => {
+        const date = new Date();
+        date.setMonth(parseInt(monthNumber) - 1);
+        return date.toLocaleString("id-ID", { month: "long" });
+    };
+
+    return (
+        <AppLayout title="Laporan">
+            <Head title="Laporan Keuangan" />
+
+            {/* Header Section */}
+            <div className="mb-8 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                        Laporan Keuangan
+                    </h1>
+                    <p className="text-sm text-slate-500 mt-1">
+                        Ringkasan operasional dan posisi kas masjid untuk
+                        periode tertentu.
+                    </p>
+                </div>
+
+                {/* Filter Controls */}
+                <div className="flex flex-col sm:flex-row items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-slate-200">
+                    <div className="flex items-center space-x-2 w-full sm:w-auto">
+                        <div className="relative flex-1 sm:flex-none">
+                            <select
+                                value={selectedMonth}
+                                onChange={(e) =>
+                                    setSelectedMonth(e.target.value)
+                                }
+                                className="appearance-none w-full sm:w-40 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-medium text-slate-700 cursor-pointer"
+                            >
+                                {[...Array(12)].map((_, i) => (
+                                    <option
+                                        key={i + 1}
+                                        value={(i + 1)
+                                            .toString()
+                                            .padStart(2, "0")}
+                                    >
+                                        {new Date(0, i).toLocaleString(
+                                            "id-ID",
+                                            { month: "long" },
+                                        )}
+                                    </option>
+                                ))}
+                            </select>
+                            <CalendarDays className="absolute right-3 top-2.5 w-4 h-4 text-slate-400 pointer-events-none" />
+                        </div>
+                        <div className="relative flex-1 sm:flex-none">
+                            <select
+                                value={selectedYear}
+                                onChange={(e) =>
+                                    setSelectedYear(e.target.value)
+                                }
+                                className="appearance-none w-full sm:w-28 px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm font-medium text-slate-700 cursor-pointer"
+                            >
+                                {years.map((y) => (
+                                    <option key={y} value={y}>
+                                        {y}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleFilter}
+                        className="w-full sm:w-auto px-6 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-colors font-medium text-sm shadow-sm"
+                    >
+                        Terapkan
+                    </button>
+                </div>
+            </div>
+
+            {/* Metrics Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {/* Total Kas Card (Highlight) */}
+                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 shadow-lg shadow-slate-900/20 text-white relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full blur-xl group-hover:bg-white/20 transition-all"></div>
+                    <div className="relative z-10 flex flex-col h-full">
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-sm">
+                                <Wallet className="w-5 h-5 text-emerald-400" />
+                            </div>
+                        </div>
+                        <p className="text-sm font-medium text-slate-300 mb-1">
+                            Total Saldo Kas
+                        </p>
+                        <h4 className="text-2xl font-black tracking-tight mt-auto">
+                            {formatCurrency(summary.saldo_total_kas)}
+                        </h4>
+                    </div>
+                </div>
+
+                {/* Pemasukan Card */}
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col">
+                    <div className="flex justify-between items-start mb-4">
+                        <div className="p-2.5 bg-emerald-50 rounded-xl">
+                            <ArrowDownRight className="w-5 h-5 text-emerald-600" />
+                        </div>
+                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-500">
+                            {getMonthName(month as string)}
+                        </span>
+                    </div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">
+                        Total Pemasukan
+                    </p>
+                    <h4 className="text-2xl font-bold text-slate-900 mt-auto">
+                        {formatCurrency(summary.pemasukan_bulan_ini)}
+                    </h4>
+                </div>
+
+                {/* Pengeluaran Card */}
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col">
+                    <div className="flex justify-between items-start mb-4">
+                        <div className="p-2.5 bg-red-50 rounded-xl">
+                            <ArrowUpRight className="w-5 h-5 text-red-600" />
+                        </div>
+                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-500">
+                            {getMonthName(month as string)}
+                        </span>
+                    </div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">
+                        Total Pengeluaran
+                    </p>
+                    <h4 className="text-2xl font-bold text-slate-900 mt-auto">
+                        {formatCurrency(summary.pengeluaran_bulan_ini)}
+                    </h4>
+                </div>
+
+                {/* Surplus/Defisit Card */}
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col">
+                    <div className="flex justify-between items-start mb-4">
+                        <div
+                            className={`p-2.5 rounded-xl ${summary.saldo_akhir_bulan >= 0 ? "bg-blue-50" : "bg-orange-50"}`}
+                        >
+                            {summary.saldo_akhir_bulan >= 0 ? (
+                                <Activity className={`w-5 h-5 text-blue-600`} />
+                            ) : (
+                                <Activity
+                                    className={`w-5 h-5 text-orange-600`}
+                                />
+                            )}
+                        </div>
+                        <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-500">
+                            {getMonthName(month as string)}
+                        </span>
+                    </div>
+                    <p className="text-sm font-medium text-slate-500 mb-1">
+                        {summary.saldo_akhir_bulan >= 0 ? "Surplus" : "Defisit"}{" "}
+                        Bersih
+                    </p>
+                    <h4
+                        className={`text-2xl font-bold mt-auto ${summary.saldo_akhir_bulan >= 0 ? "text-blue-600" : "text-orange-600"}`}
+                    >
+                        {summary.saldo_akhir_bulan > 0 ? "+" : ""}
+                        {formatCurrency(summary.saldo_akhir_bulan)}
+                    </h4>
+                </div>
+            </div>
+
+            {/* Breakdown Lists */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Pemasukan Breakdown */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                        <h4 className="font-bold text-slate-800 flex items-center text-lg">
+                            <TrendingDown className="w-5 h-5 text-emerald-500 mr-2.5" />
+                            Rincian Pemasukan
+                        </h4>
+                        <span className="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-2.5 py-1 rounded-lg">
+                            {breakdown.pemasukan.length} Kategori
+                        </span>
+                    </div>
+                    <div className="p-2 flex-1">
+                        {breakdown.pemasukan.length > 0 ? (
+                            <ul className="space-y-1">
+                                {breakdown.pemasukan.map((item, idx) => (
+                                    <li
+                                        key={idx}
+                                        className="flex justify-between items-center p-4 hover:bg-slate-50 rounded-xl transition-colors"
+                                    >
+                                        <div className="flex items-center">
+                                            <div className="w-2 h-2 rounded-full bg-emerald-500 mr-3"></div>
+                                            <span className="text-sm font-medium text-slate-700">
+                                                {formatCat(item.category)}
+                                            </span>
+                                        </div>
+                                        <span className="text-sm font-bold text-emerald-600">
+                                            {formatCurrency(item.total)}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center p-12 text-center">
+                                <PieChart className="w-12 h-12 text-slate-200 mb-3" />
+                                <p className="text-slate-500 font-medium">
+                                    Tidak ada data pemasukan
+                                </p>
+                                <p className="text-sm text-slate-400 mt-1">
+                                    Belum ada transaksi di bulan ini.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Pengeluaran Breakdown */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                        <h4 className="font-bold text-slate-800 flex items-center text-lg">
+                            <TrendingUp className="w-5 h-5 text-red-500 mr-2.5" />
+                            Rincian Pengeluaran
+                        </h4>
+                        <span className="text-xs font-semibold text-slate-500 bg-white border border-slate-200 px-2.5 py-1 rounded-lg">
+                            {breakdown.pengeluaran.length} Kategori
+                        </span>
+                    </div>
+                    <div className="p-2 flex-1">
+                        {breakdown.pengeluaran.length > 0 ? (
+                            <ul className="space-y-1">
+                                {breakdown.pengeluaran.map((item, idx) => (
+                                    <li
+                                        key={idx}
+                                        className="flex justify-between items-center p-4 hover:bg-slate-50 rounded-xl transition-colors"
+                                    >
+                                        <div className="flex items-center">
+                                            <div className="w-2 h-2 rounded-full bg-red-500 mr-3"></div>
+                                            <span className="text-sm font-medium text-slate-700">
+                                                {formatCat(item.category)}
+                                            </span>
+                                        </div>
+                                        <span className="text-sm font-bold text-red-600">
+                                            {formatCurrency(item.total)}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="h-full flex flex-col items-center justify-center p-12 text-center">
+                                <Building className="w-12 h-12 text-slate-200 mb-3" />
+                                <p className="text-slate-500 font-medium">
+                                    Tidak ada data pengeluaran
+                                </p>
+                                <p className="text-sm text-slate-400 mt-1">
+                                    Belum ada transaksi di bulan ini.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </AppLayout>
+    );
+}

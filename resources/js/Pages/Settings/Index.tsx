@@ -1,0 +1,246 @@
+import React from "react";
+import AppLayout from "@/Layouts/AppLayout";
+import { Head, useForm } from "@inertiajs/react";
+import { PageProps } from "@/types";
+import {
+    Settings,
+    Building2,
+    Phone,
+    MapPin,
+    Calculator,
+    Save,
+} from "lucide-react";
+
+export default function SettingsIndex({
+    auth,
+    settings,
+}: PageProps<{ settings: Record<string, string> }>) {
+    const { data, setData, post, processing, errors } = useForm({
+        settings: {
+            masjid_name: settings?.masjid_name || "Sistem Manajemen Masjid",
+            masjid_address: settings?.masjid_address || "",
+            contact_phone: settings?.contact_phone || "",
+            zakat_fitrah_amount: settings?.zakat_fitrah_amount || "40000",
+        },
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route("settings.store"), {
+            preserveScroll: true,
+        });
+    };
+
+    return (
+        <AppLayout title="Pengaturan">
+            <Head title="Pengaturan Sistem" />
+
+            {/* Header Section */}
+            <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center">
+                        <Settings className="w-6 h-6 mr-2.5 text-slate-700" />
+                        Pengaturan Sistem
+                    </h1>
+                    <p className="text-sm text-slate-500 mt-1">
+                        Kelola profil masjid dan parameter dasar aplikasi.
+                    </p>
+                </div>
+            </div>
+
+            <div className="max-w-4xl">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Profil Masjid Card */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center">
+                                <Building2 className="w-5 h-5 mr-2 text-emerald-600" />
+                                Profil Masjid Utama
+                            </h3>
+                            <p className="text-sm text-slate-500 mt-1">
+                                Informasi ini akan ditampilkan di kop laporan
+                                dan kuitansi.
+                            </p>
+                        </div>
+
+                        <div className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center">
+                                        Nama Masjid
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={data.settings.masjid_name}
+                                        onChange={(e) =>
+                                            setData("settings", {
+                                                ...data.settings,
+                                                masjid_name: e.target.value,
+                                            })
+                                        }
+                                        className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm shadow-sm transition-colors"
+                                        placeholder="Misal: Masjid Jami' Al-Ikhlas"
+                                    />
+                                    {errors?.["settings.masjid_name"] && (
+                                        <p className="text-red-500 text-xs mt-1.5 font-medium">
+                                            {errors["settings.masjid_name"]}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center">
+                                        Nomor Kontak / WA DKM
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Phone className="h-4 w-4 text-slate-400" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={data.settings.contact_phone}
+                                            onChange={(e) =>
+                                                setData("settings", {
+                                                    ...data.settings,
+                                                    contact_phone:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm shadow-sm transition-colors"
+                                            placeholder="Misal: 081234567890"
+                                        />
+                                    </div>
+                                    {errors?.["settings.contact_phone"] && (
+                                        <p className="text-red-500 text-xs mt-1.5 font-medium">
+                                            {errors["settings.contact_phone"]}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5 flex items-center">
+                                        Alamat Lengkap
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute top-3 left-3 flex items-start pointer-events-none">
+                                            <MapPin className="h-4 w-4 text-slate-400" />
+                                        </div>
+                                        <textarea
+                                            value={data.settings.masjid_address}
+                                            onChange={(e) =>
+                                                setData("settings", {
+                                                    ...data.settings,
+                                                    masjid_address:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            className="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm shadow-sm transition-colors resize-none"
+                                            rows={3}
+                                            placeholder="Masukkan alamat lengkap masjid..."
+                                        />
+                                    </div>
+                                    {errors?.["settings.masjid_address"] && (
+                                        <p className="text-red-500 text-xs mt-1.5 font-medium">
+                                            {errors["settings.masjid_address"]}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Parameter Keuangan Card */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div className="px-6 py-5 border-b border-slate-100 bg-slate-50/50">
+                            <h3 className="text-lg font-bold text-slate-800 flex items-center">
+                                <Calculator className="w-5 h-5 mr-2 text-blue-600" />
+                                Parameter Keuangan & Zakat
+                            </h3>
+                            <p className="text-sm text-slate-500 mt-1">
+                                Pengaturan khusus variabel keuangan dan
+                                kalkulator zakat.
+                            </p>
+                        </div>
+
+                        <div className="p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                                        Ketetapan Zakat Fitrah{" "}
+                                        <span className="text-slate-500 font-normal">
+                                            (Rp / Jiwa)
+                                        </span>
+                                    </label>
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <span className="text-slate-500 font-medium sm:text-sm">
+                                                Rp
+                                            </span>
+                                        </div>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            value={
+                                                data.settings
+                                                    .zakat_fitrah_amount
+                                            }
+                                            onChange={(e) =>
+                                                setData("settings", {
+                                                    ...data.settings,
+                                                    zakat_fitrah_amount:
+                                                        e.target.value,
+                                                })
+                                            }
+                                            className="w-full pl-12 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm shadow-sm transition-colors font-medium text-slate-900"
+                                        />
+                                    </div>
+                                    <p className="text-xs text-slate-500 mt-2 flex items-center">
+                                        <span className="w-1 h-1 rounded-full bg-slate-400 mr-1.5"></span>
+                                        Nominal acuan beras/uang untuk 1 jiwa
+                                        per tahun
+                                    </p>
+                                    {errors?.[
+                                        "settings.zakat_fitrah_amount"
+                                    ] && (
+                                        <p className="text-red-500 text-xs mt-1.5 font-medium">
+                                            {
+                                                errors[
+                                                    "settings.zakat_fitrah_amount"
+                                                ]
+                                            }
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center justify-end pt-2 space-x-4">
+                        <button
+                            type="button"
+                            onClick={() => window.history.back()}
+                            className="px-6 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-xl hover:bg-slate-50 font-medium transition-colors shadow-sm"
+                        >
+                            Batal
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={processing}
+                            className="inline-flex items-center justify-center px-6 py-2.5 bg-emerald-600 border border-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors shadow-sm shadow-emerald-200 font-medium disabled:opacity-70 disabled:cursor-not-allowed"
+                        >
+                            {processing ? (
+                                <>Menyimpan...</>
+                            ) : (
+                                <>
+                                    <Save className="w-4 h-4 mr-2" />
+                                    Simpan Pengaturan
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </AppLayout>
+    );
+}
