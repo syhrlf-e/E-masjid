@@ -23,3 +23,8 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 /.brief_project/
+
+# Debug / Test output files
+test_output*.txt
+generate_icons.php
+*.sql.dump
