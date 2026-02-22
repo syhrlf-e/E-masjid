@@ -235,7 +235,7 @@ export default function Dashboard({
                                     {dayjs().format("MMM YYYY")}
                                 </span>
                             </div>
-                            <p className="text-sm font-medium text-slate-500 mb-1">
+                            <p className="text-sm    font-medium text-slate-500 mb-1">
                                 Pengeluaran Bulan Ini
                             </p>
                             {loading ? (

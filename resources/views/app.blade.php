@@ -40,7 +40,30 @@
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                        .then((registration) => {
+                            // Cek update setiap 60 detik
+                            setInterval(() => registration.update(), 60 * 1000);
+
+                            registration.addEventListener('updatefound', () => {
+                                const newWorker = registration.installing;
+                                if (newWorker) {
+                                    newWorker.addEventListener('statechange', () => {
+                                        if (newWorker.state === 'activated') {
+                                            // SW baru aktif → reload otomatis
+                                            window.location.reload();
+                                        }
+                                    });
+                                }
+                            });
+                        })
                         .catch((error) => console.error('PWA SW Registration Failed:', error));
+
+                    // Listener: jika SW mengirim pesan update
+                    navigator.serviceWorker.addEventListener('message', (event) => {
+                        if (event.data && event.data.type === 'SW_UPDATED') {
+                            window.location.reload();
+                        }
+                    });
                 });
             }
         </script>

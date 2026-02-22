@@ -1,4 +1,5 @@
-const CACHE_NAME = "emasjid-v1";
+const CACHE_VERSION = Date.now(); // Auto-versioning: berubah setiap SW file berubah
+const CACHE_NAME = `emasjid-v${CACHE_VERSION}`;
 
 // App Shell: file statis yang di-cache saat install
 const APP_SHELL = [
@@ -14,15 +15,15 @@ self.addEventListener("install", (event) => {
             .then((cache) => {
                 return cache.addAll(APP_SHELL);
             })
-            .then(() => self.skipWaiting()),
+            .then(() => self.skipWaiting()), // Langsung aktifkan SW baru
     );
 });
 
 self.addEventListener("activate", (event) => {
     event.waitUntil(
         Promise.all([
-            clients.claim(),
-            // Hapus cache versi lama
+            clients.claim(), // Ambil alih semua tab yang terbuka
+            // Hapus SEMUA cache versi lama
             caches
                 .keys()
                 .then((keys) =>
@@ -32,7 +33,14 @@ self.addEventListener("activate", (event) => {
                             .map((k) => caches.delete(k)),
                     ),
                 ),
-        ]),
+        ]).then(() => {
+            // Notifikasi semua client untuk reload
+            self.clients.matchAll().then((clients) => {
+                clients.forEach((client) => {
+                    client.postMessage({ type: "SW_UPDATED" });
+                });
+            });
+        }),
     );
 });
 
@@ -44,7 +52,7 @@ self.addEventListener("fetch", (event) => {
     if (request.method !== "GET") return;
     if (url.protocol === "chrome-extension:") return;
 
-    // 1. Aset Statis (build Vite, gambar, font) → Stale-While-Revalidate
+    // 1. Aset Statis (build Vite, gambar, font) → Network First, fallback Cache
     const isStaticAsset =
         url.pathname.startsWith("/build/") ||
         url.pathname.startsWith("/images/") ||
@@ -54,21 +62,17 @@ self.addEventListener("fetch", (event) => {
 
     if (isStaticAsset) {
         event.respondWith(
-            caches.match(request).then((cached) => {
-                const fetchPromise = fetch(request)
-                    .then((response) => {
-                        if (response && response.status === 200) {
-                            const clone = response.clone();
-                            caches
-                                .open(CACHE_NAME)
-                                .then((cache) => cache.put(request, clone));
-                        }
-                        return response;
-                    })
-                    .catch(() => cached); // fallback ke cache kalau offline
-
-                return cached || fetchPromise;
-            }),
+            fetch(request)
+                .then((response) => {
+                    if (response && response.status === 200) {
+                        const clone = response.clone();
+                        caches
+                            .open(CACHE_NAME)
+                            .then((cache) => cache.put(request, clone));
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(request)), // fallback ke cache kalau offline
         );
         return;
     }
