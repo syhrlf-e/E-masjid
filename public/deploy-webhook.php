@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Run deploy script in background
-exec('bash /var/www/deploy.sh > /dev/null 2>&1 &');
+exec('bash /var/www/emasjid/deploy.sh > /dev/null 2>&1 &');
 
 http_response_code(200);
 echo json_encode(['status' => 'Deploy started', 'time' => date('Y-m-d H:i:s')]);
