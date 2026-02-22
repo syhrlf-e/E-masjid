@@ -67,11 +67,8 @@ export default function AppLayout({ title, children }: Props) {
                 {/* Logo Area */}
                 <div className="h-20 flex items-center px-6 border-b border-slate-100">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
-                            <Box size={20} />
-                        </div>
                         <div>
-                            <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-tight">
+                            <h1 className="text-xl font-extrabold text-slate-900 tracking-tight leading-tight">
                                 E-Masjid
                             </h1>
                             <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">

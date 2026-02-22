@@ -18,6 +18,7 @@ import {
     MapPin,
     CalendarDays,
     Activity,
+    FileText,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
@@ -533,6 +534,40 @@ export default function Dashboard({
                             )}
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Monthly Report Full-width Shortcut */}
+            <div className="w-full bg-white rounded-2xl p-6 shadow-md border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mt-6">
+                <div className="flex items-center">
+                    <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl mr-4 shrink-0">
+                        <FileText className="w-6 h-6" />
+                    </div>
+                    <div>
+                        <h3 className="text-xl font-bold text-slate-800 tracking-tight mb-1">
+                            Laporan Keuangan {dayjs().format("MMMM YYYY")}
+                        </h3>
+                        <p className="text-slate-500 text-sm font-medium">
+                            Unduh rekapitulasi pemasukan dan pengeluaran bulan
+                            ini.
+                        </p>
+                    </div>
+                </div>
+
+                <div className="shrink-0 mt-2 sm:mt-0 w-full sm:w-auto">
+                    <button
+                        type="button"
+                        onClick={() => {
+                            window.open(
+                                window.location.origin + "/laporan/export",
+                                "_self",
+                            );
+                        }}
+                        className="inline-flex w-full sm:w-auto items-center justify-center px-6 py-3 bg-emerald-600 text-white font-bold text-sm rounded-xl hover:bg-emerald-700 shadow-sm transition-all focus:ring-2 focus:ring-emerald-500/50 focus:outline-none cursor-pointer"
+                    >
+                        Unduh Laporan (Excel)
+                        <ArrowDownRight className="w-4 h-4 ml-2 opacity-90" />
+                    </button>
                 </div>
             </div>
         </AppLayout>

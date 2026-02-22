@@ -39,10 +39,10 @@ export default function Login({
             )}
 
             <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">
                     Selamat Datang 👋
                 </h2>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm font-medium text-gray-500">
                     Silakan masuk dengan akun Anda untuk mengakses dashboard
                     manajemen.
                 </p>
@@ -53,7 +53,7 @@ export default function Login({
                     <InputLabel
                         htmlFor="email"
                         value="Alamat Email"
-                        className="mb-1.5 ml-1 text-gray-700 font-medium"
+                        className="mb-1.5 ml-1 text-slate-700 font-semibold"
                     />
 
                     <TextInput
@@ -75,7 +75,7 @@ export default function Login({
                     <InputLabel
                         htmlFor="password"
                         value="Kata Sandi"
-                        className="mb-1.5 ml-1 text-gray-700 font-medium"
+                        className="mb-1.5 ml-1 text-slate-700 font-semibold"
                     />
 
                     <TextInput
@@ -133,7 +133,7 @@ export default function Login({
                 </div>
             </form>
 
-            <div className="mt-8 text-center text-sm text-gray-500">
+            <div className="mt-8 text-center text-xs text-slate-400">
                 <p>
                     © {new Date().getFullYear()} E-Masjid. Hak Cipta Dilindungi.
                 </p>

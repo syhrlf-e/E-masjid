@@ -23,15 +23,15 @@ export default function Guest({ children }: PropsWithChildren) {
                         <div className="mb-8">
                             {/* Replace with actual logo if available, or text */}
                             <div className="flex items-center space-x-3">
-                                <span className="text-2xl font-bold tracking-tight">
+                                <span className="text-3xl font-extrabold tracking-widest uppercase">
                                     E-Masjid
                                 </span>
                             </div>
                         </div>
-                        <h1 className="mb-4 text-4xl font-extrabold tracking-tight">
+                        <h1 className="mb-4 text-4xl font-extrabold tracking-tight leading-tight">
                             Sistem Manajemen Digital
                         </h1>
-                        <p className="text-lg text-emerald-100 max-w-lg leading-relaxed">
+                        <p className="text-lg font-medium text-emerald-50 max-w-lg leading-relaxed">
                             Platform modern untuk mengelola keuangan,
                             inventaris, zakat, dan agenda kegiatan masjid secara
                             profesional, transparan, dan terpercaya.

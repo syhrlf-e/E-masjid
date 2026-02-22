@@ -52,6 +52,7 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::resource('inventaris', \App\Http\Controllers\InventoryItemController::class)->parameters(['inventaris' => 'inventoryItem'])->except(['show', 'create', 'edit']);
     Route::resource('agenda', \App\Http\Controllers\AgendaController::class)->except(['create', 'show', 'edit']);
     Route::get('laporan', [\App\Http\Controllers\ReportController::class, 'index'])->name('laporan.index');
+    Route::get('laporan/export', [\App\Http\Controllers\ReportController::class, 'export'])->name('laporan.export');
     Route::get('settings', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
     Route::post('settings', [\App\Http\Controllers\SettingController::class, 'store'])->name('settings.store');
 });
