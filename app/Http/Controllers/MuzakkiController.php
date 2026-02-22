@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Donatur;
+use App\Imports\MuzakkiImport;
 use App\Http\Requests\StoreMuzakkiRequest;
 use App\Http\Requests\UpdateMuzakkiRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Request; // Use Facade for Request::input, etc. but method injection is better.
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request as RequestFacade;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,8 +16,6 @@ class MuzakkiController extends Controller
 {
     public function index(): Response
     {
-        // Add Authorization here if needed, e.g., $this->authorize('viewAny', Donatur::class);
-        
         $query = Donatur::query();
 
         if (request('search')) {
@@ -34,7 +34,6 @@ class MuzakkiController extends Controller
                 'name' => $donatur->name,
                 'phone' => $canViewPrivateData ? $donatur->phone : ($donatur->phone ? '*** (Rahasia)' : null),
                 'address' => $canViewPrivateData ? $donatur->address : ($donatur->address ? 'Dirahasiakan' : null),
-                // Add total donation calculation here if needed later
             ]);
 
         return Inertia::render('Zakat/Muzakki/Index', [
@@ -45,8 +44,6 @@ class MuzakkiController extends Controller
 
     public function store(StoreMuzakkiRequest $request): RedirectResponse
     {
-        // Authorization: $this->authorize('create', Donatur::class);
-
         Donatur::create($request->validated());
 
         return redirect()->back()->with('success', 'Muzakki berhasil ditambahkan.');
@@ -54,8 +51,6 @@ class MuzakkiController extends Controller
 
     public function update(UpdateMuzakkiRequest $request, Donatur $muzakki): RedirectResponse
     {
-        // Authorization: $this->authorize('update', $muzakki);
-
         $muzakki->update($request->validated());
 
         return redirect()->back()->with('success', 'Data Muzakki berhasil diperbarui.');
@@ -63,10 +58,29 @@ class MuzakkiController extends Controller
 
     public function destroy(Donatur $muzakki): RedirectResponse
     {
-        // Authorization: $this->authorize('delete', $muzakki);
-
         $muzakki->delete();
 
         return redirect()->back()->with('success', 'Muzakki berhasil dihapus.');
     }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120',
+        ]);
+
+        $import = new MuzakkiImport();
+        $import->import($request->file('file'));
+
+        $failures = $import->failures();
+        $importedCount = $import->getImportedCount() - count($failures);
+
+        if (count($failures) > 0) {
+            $errorRows = collect($failures)->map(fn ($f) => "Baris {$f->row()}: {$f->errors()[0]}")->take(5)->join(', ');
+            return redirect()->back()->with('warning', "Berhasil import {$importedCount} data. {$errorRows}");
+        }
+
+        return redirect()->back()->with('success', "Berhasil import {$importedCount} data Muzakki.");
+    }
 }
+

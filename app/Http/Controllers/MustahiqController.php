@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mustahiq;
+use App\Imports\MustahiqImport;
 use App\Http\Requests\StoreMustahiqRequest;
 use App\Http\Requests\UpdateMustahiqRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -59,5 +61,25 @@ class MustahiqController extends Controller
         $mustahiq->delete();
 
         return redirect()->back()->with('success', 'Mustahiq berhasil dihapus.');
+    }
+
+    public function import(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:5120',
+        ]);
+
+        $import = new MustahiqImport();
+        $import->import($request->file('file'));
+
+        $failures = $import->failures();
+        $importedCount = $import->getImportedCount() - count($failures);
+
+        if (count($failures) > 0) {
+            $errorRows = collect($failures)->map(fn ($f) => "Baris {$f->row()}: {$f->errors()[0]}")->take(5)->join(', ');
+            return redirect()->back()->with('warning', "Berhasil import {$importedCount} data. {$errorRows}");
+        }
+
+        return redirect()->back()->with('success', "Berhasil import {$importedCount} data Mustahiq.");
     }
 }

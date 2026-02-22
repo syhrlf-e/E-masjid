@@ -33,10 +33,12 @@ Route::middleware(['auth', 'verified', 'active'])->group(function () {
     Route::post('zakat/muzakki', [\App\Http\Controllers\MuzakkiController::class, 'store'])->name('zakat.muzakki.store');
     Route::put('zakat/muzakki/{muzakki}', [\App\Http\Controllers\MuzakkiController::class, 'update'])->name('zakat.muzakki.update');
     Route::delete('zakat/muzakki/{muzakki}', [\App\Http\Controllers\MuzakkiController::class, 'destroy'])->name('zakat.muzakki.destroy');
+    Route::post('zakat/muzakki/import', [\App\Http\Controllers\MuzakkiController::class, 'import'])->name('zakat.muzakki.import');
     Route::get('zakat/mustahiq', [\App\Http\Controllers\MustahiqController::class, 'index'])->name('zakat.mustahiq');
     Route::post('zakat/mustahiq', [\App\Http\Controllers\MustahiqController::class, 'store'])->name('zakat.mustahiq.store');
     Route::put('zakat/mustahiq/{mustahiq}', [\App\Http\Controllers\MustahiqController::class, 'update'])->name('zakat.mustahiq.update');
     Route::delete('zakat/mustahiq/{mustahiq}', [\App\Http\Controllers\MustahiqController::class, 'destroy'])->name('zakat.mustahiq.destroy');
+    Route::post('zakat/mustahiq/import', [\App\Http\Controllers\MustahiqController::class, 'import'])->name('zakat.mustahiq.import');
     Route::get('zakat/transaksi', [\App\Http\Controllers\ZakatController::class, 'history'])->name('zakat.transaksi');
 
     // Tromol

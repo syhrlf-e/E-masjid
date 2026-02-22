@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Head, router } from "@inertiajs/react";
+import { useState, useEffect, useRef } from "react";
+import { Head, router, useForm } from "@inertiajs/react";
 import AppLayout from "@/Layouts/AppLayout";
 import ConfirmDialog from "@/Components/ConfirmDialog";
 import EmptyState from "@/Components/EmptyState";
@@ -14,6 +14,9 @@ import {
     MapPin,
     ChevronLeft,
     ChevronRight,
+    Upload,
+    FileSpreadsheet,
+    X,
 } from "lucide-react";
 
 interface Muzakki {
@@ -48,6 +51,15 @@ export default function Index({ muzakkis, filters }: Props) {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingMuzakki, setEditingMuzakki] = useState<Muzakki | null>(null);
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+    const [isImportOpen, setIsImportOpen] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const {
+        data: importData,
+        setData: setImportData,
+        post: postImport,
+        processing: importing,
+        reset: resetImport,
+    } = useForm<{ file: File | null }>({ file: null });
 
     // Debounce search
     useEffect(() => {
@@ -97,6 +109,18 @@ export default function Index({ muzakkis, filters }: Props) {
             .replace(/Next/g, "");
     };
 
+    const handleImport = () => {
+        if (!importData.file) return;
+        postImport(route("zakat.muzakki.import"), {
+            forceFormData: true,
+            onSuccess: () => {
+                setIsImportOpen(false);
+                resetImport();
+                if (fileInputRef.current) fileInputRef.current.value = "";
+            },
+        });
+    };
+
     return (
         <AppLayout title="Zakat">
             <Head title="Manajemen Muzakki" />
@@ -111,15 +135,24 @@ export default function Index({ muzakkis, filters }: Props) {
                         Kelola direktori donatur zakat, infaq, dan shodaqoh.
                     </p>
                 </div>
-                {muzakkis.data.length > 0 && (
+                <div className="flex items-center gap-2">
                     <button
-                        onClick={handleCreate}
-                        className="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors shadow-sm shadow-emerald-200 font-medium"
+                        onClick={() => setIsImportOpen(true)}
+                        className="inline-flex items-center justify-center px-4 py-2.5 bg-white text-slate-700 border border-slate-300 rounded-xl hover:bg-slate-50 transition-colors font-medium"
                     >
-                        <Plus className="w-5 h-5 mr-2" />
-                        Tambah Muzakki
+                        <Upload className="w-4 h-4 mr-2" />
+                        Import Excel
                     </button>
-                )}
+                    {muzakkis.data.length > 0 && (
+                        <button
+                            onClick={handleCreate}
+                            className="inline-flex items-center justify-center px-4 py-2.5 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors shadow-sm shadow-emerald-200 font-medium"
+                        >
+                            <Plus className="w-5 h-5 mr-2" />
+                            Tambah Muzakki
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Main Content Area */}
@@ -363,6 +396,92 @@ export default function Index({ muzakkis, filters }: Props) {
                 terkait tidak akan dihapus permanen, namun status donatur ini
                 akan dinonaktifkan.
             </ConfirmDialog>
+
+            {/* Import Excel Modal */}
+            {isImportOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-emerald-50 rounded-xl">
+                                    <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
+                                </div>
+                                <h3 className="text-lg font-semibold text-slate-900">
+                                    Import Data Muzakki
+                                </h3>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setIsImportOpen(false);
+                                    resetImport();
+                                }}
+                                className="p-1 hover:bg-slate-100 rounded-lg transition-colors"
+                            >
+                                <X className="w-5 h-5 text-slate-400" />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div className="border-2 border-dashed border-slate-200 rounded-xl p-6 text-center hover:border-emerald-300 transition-colors">
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept=".xlsx,.xls,.csv"
+                                    onChange={(e) =>
+                                        setImportData(
+                                            "file",
+                                            e.target.files?.[0] || null,
+                                        )
+                                    }
+                                    className="hidden"
+                                    id="import-file-muzakki"
+                                />
+                                <label
+                                    htmlFor="import-file-muzakki"
+                                    className="cursor-pointer"
+                                >
+                                    <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                                    <p className="text-sm font-medium text-slate-700">
+                                        {importData.file
+                                            ? importData.file.name
+                                            : "Klik untuk pilih file"}
+                                    </p>
+                                    <p className="text-xs text-slate-400 mt-1">
+                                        .xlsx, .xls, atau .csv (maks 5MB)
+                                    </p>
+                                </label>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-4 text-xs text-slate-500">
+                                <p className="font-semibold text-slate-600 mb-1">
+                                    Format kolom Excel:
+                                </p>
+                                <p>Nama | No HP | Alamat</p>
+                                <p className="mt-1 text-slate-400">
+                                    Baris pertama harus berisi header (Nama,
+                                    No_HP, Alamat)
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex justify-end gap-2 p-6 border-t border-slate-100">
+                            <button
+                                onClick={() => {
+                                    setIsImportOpen(false);
+                                    resetImport();
+                                }}
+                                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={handleImport}
+                                disabled={!importData.file || importing}
+                                className="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {importing ? "Mengimport..." : "Import Data"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }
