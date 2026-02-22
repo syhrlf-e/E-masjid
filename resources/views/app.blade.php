@@ -4,11 +4,11 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia></title>
 
         <!-- PWA: General -->
         <link rel="manifest" href="/manifest.json">
-        <meta name="theme-color" content="#059669">
+        <meta name="theme-color" content="#ffffff">
 
         <!-- PWA: Android / Chrome -->
         <meta name="mobile-web-app-capable" content="yes">
@@ -16,12 +16,12 @@
 
         <!-- PWA: iOS / Safari -->
         <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
         <meta name="apple-mobile-web-app-title" content="E-Masjid">
         <link rel="apple-touch-icon" href="/images/icon-192.png">
 
         <!-- PWA: Microsoft (Edge/Windows) -->
-        <meta name="msapplication-TileColor" content="#059669">
+        <meta name="msapplication-TileColor" content="#ffffff">
         <meta name="msapplication-TileImage" content="/images/icon-192.png">
 
 

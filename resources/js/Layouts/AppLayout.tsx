@@ -48,6 +48,8 @@ export default function AppLayout({ title, children }: Props) {
 
     return (
         <div className="h-screen bg-slate-50 font-sans flex text-slate-900 overflow-hidden">
+            {/* PWA Window Controls Overlay - Drag Region */}
+            <div className="pwa-titlebar-drag"></div>
             {/* Overlay for mobile sidebar */}
             {isSidebarOpen && (
                 <div

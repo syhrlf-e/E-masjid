@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ================================================
+   Window Controls Overlay (PWA Title Bar)
+   Hanya aktif saat PWA di-install di desktop
+   ================================================ */
+@media all and (display-mode: window-controls-overlay) {
+    html {
+        /* Area aman di bawah tombol native window controls */
+        padding-top: env(titlebar-area-height, 0px);
+    }
+
+    /* Drag region: area kosong di title bar bisa di-drag untuk pindah jendela */
+    .pwa-titlebar-drag {
+        position: fixed;
+        top: 0;
+        left: env(titlebar-area-x, 0px);
+        width: env(titlebar-area-width, 100%);
+        height: env(titlebar-area-height, 0px);
+        -webkit-app-region: drag;
+        app-region: drag;
+        z-index: 9999;
+        background: transparent;
+    }
+}
